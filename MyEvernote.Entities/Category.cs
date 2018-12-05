@@ -12,17 +12,9 @@ namespace MyEvernote.Entities
 {
     [Table("Categories")]
     public class Category : MyEntityBase
-    {
-        //[DisplayName("Kategori"),
-        //    Required(ErrorMessage = "{0} alanı gereklidir."),
-        //    StringLength(50, ErrorMessage = "{0} alanı max. {1} karakter içermeli.")]
-        //public string Title { get; set; }
+    { 
 
-        //[DisplayName("Açıklama"),
-        //    StringLength(150, ErrorMessage = "{0} alanı max. {1} karakter içermeli.")]
-        //public string Description { get; set; }
-
-        [DisplayName("Başlık"), Required(ErrorMessage = "{0} alanı gereklidir"), StringLength(50, ErrorMessage = "{0} alanı max. {1} karakter olmalıdır")]
+        [DisplayName("Kategori"), Required(ErrorMessage = "{0} alanı gereklidir"), StringLength(50, ErrorMessage = "{0} alanı max. {1} karakter olmalıdır")]
         public string Title { get; set; }
 
         [DisplayName("Açıklama"),StringLength(150, ErrorMessage = "{0} alanı {1} karakter olmalıdır")]

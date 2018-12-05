@@ -8,16 +8,16 @@ using System.Web;
 using System.Web.Mvc;
 using MyEvernote.Entities;
 using MyEvernote.BusinessLayer;
-using MyEvernote.WebApp.Models;
+using MyEvernote.BusinessLayer.Results;
 
 namespace MyEvernote.WebApp.Controllers
 {
-    public class CategoryController : Controller
+    public class EvernoteUserController : Controller
     {
-        private CategoryManager categoryManager = new CategoryManager();
+        EvernoteUserManager db = new EvernoteUserManager();
         public ActionResult Index()
         {
-            return View(CacheHelper.GetCategoriesFromCache());
+            return View(db.List());
         }
          
         public ActionResult Details(int? id)
@@ -26,14 +26,14 @@ namespace MyEvernote.WebApp.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Category category = categoryManager.Find(x=> x.Id == id.Value);
-            if (category == null)
+            EvernoteUser evernoteUser = db.Find(x=>x.Id == id.Value);
+            if (evernoteUser == null)
             {
                 return HttpNotFound();
             }
-            return View(category);
+            return View(evernoteUser);
         }
-         
+
         public ActionResult Create()
         {
             return View();
@@ -41,41 +41,43 @@ namespace MyEvernote.WebApp.Controllers
          
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Category category)
+        public ActionResult Create(EvernoteUser evernoteUser)
         {
             ModelState.Remove("CreatedOn");
             ModelState.Remove("ModifiedOn");
             ModelState.Remove("ModifiedUsername");
+
             if (ModelState.IsValid)
             {
-                categoryManager.Insert(category);
-                CacheHelper.RemoveCategoriesCache();
+                BusinessLayerResult<EvernoteUser> res =  db.Insert(evernoteUser);
+                if (res.Errors.Count > 0)
+                {
+                    res.Errors.ForEach(x => ModelState.AddModelError("",x.Message));
+                    return View(evernoteUser);
+                }
                 return RedirectToAction("Index");
             }
 
-            return View(category);
-        } 
-
+            return View(evernoteUser);
+        }
+         
         public ActionResult Edit(int? id)
         {
-            ModelState.Remove("CreatedOn");
-            ModelState.Remove("ModifiedOn");
-            ModelState.Remove("ModifiedUsername");
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Category category = categoryManager.Find(x=>x.Id == id.Value);
-            if (category == null)
+            EvernoteUser evernoteUser = db.Find(x=>x.Id == id);
+            if (evernoteUser == null)
             {
                 return HttpNotFound();
             }
-            return View(category);
+            return View(evernoteUser);
         }
-         
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(Category category)
+        public ActionResult Edit(EvernoteUser evernoteUser)
         {
             ModelState.Remove("CreatedOn");
             ModelState.Remove("ModifiedOn");
@@ -83,40 +85,40 @@ namespace MyEvernote.WebApp.Controllers
 
             if (ModelState.IsValid)
             {
-                Category cat = categoryManager.Find(x => x.Id == category.Id);
-                cat.Title = category.Title;
-                cat.Description = category.Description;
-                categoryManager.Update(cat);
-                CacheHelper.RemoveCategoriesCache();
+                BusinessLayerResult<EvernoteUser> res = db.Update(evernoteUser);
+                if (res.Errors.Count > 0)
+                {
+                    res.Errors.ForEach(x => ModelState.AddModelError("", x.Message));
+                    return View(evernoteUser);
+                }
                 return RedirectToAction("Index");
             }
-            return View(category);
+            return View(evernoteUser);
         }
+        
 
-        // GET: Categories/Delete/5
         public ActionResult Delete(int? id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Category category = categoryManager.Find(x=>x.Id == id);
-            if (category == null)
+            EvernoteUser evernoteUser = db.Find(x=>x.Id==id.Value);
+            if (evernoteUser == null)
             {
                 return HttpNotFound();
             }
-            return View(category);
+            return View(evernoteUser);
         }
-         
+
+
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            Category category = categoryManager.Find(x => x.Id == id);
-            categoryManager.Delete(category);
-            CacheHelper.RemoveCategoriesCache();
+            EvernoteUser evernoteUser = db.Find(x=>x.Id == id);
+            db.Delete(evernoteUser); 
             return RedirectToAction("Index");
-        }
-         
+        } 
     }
 }

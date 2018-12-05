@@ -63,13 +63,8 @@
     </div>
 
 
-    <div class="col-md-8 col-md-offset-2">
-        <a href="/Category/Edit/@Model.Id" class="btn btn-warning" title="Edit">
-            <span class="glyphicon glyphicon-edit"></span> Edit
-        </a>
-
-        <a href="/Category/Index" class="btn btn-info" title="Index">
-            <span class="glyphicon glyphicon-arrow-left"></span>Back to List
-        </a>
+    <div class="col-md-8 col-md-offset-2">         
+        @Bootstrap.LinkButton("/Category/Edit/"+ @Model.Id, "warning", string.Empty, "Edit", "edit", "Edit")
+        @Bootstrap.LinkButton("/Category/Index", "info", string.Empty, string.Empty, "arrow-left", "Back to List")
     </div>
 </div> 

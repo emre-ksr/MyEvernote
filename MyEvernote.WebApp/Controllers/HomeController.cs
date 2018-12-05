@@ -2,6 +2,7 @@
 using MyEvernote.BusinessLayer.Results;
 using MyEvernote.Entities;
 using MyEvernote.Entities.ValueObjects;
+using MyEvernote.WebApp.Models;
 using MyEvernote.WebApp.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -63,9 +64,8 @@ namespace MyEvernote.WebApp.Controllers
 
 
         public ActionResult ShowProfile()
-        {
-            EvernoteUser currentUser = Session["login"] as EvernoteUser;
-            BusinessLayerResult<EvernoteUser> res = evernoteUserManager.GetUserById(currentUser.Id);
+        { 
+            BusinessLayerResult<EvernoteUser> res = evernoteUserManager.GetUserById(CurrentSession.User.Id);
             if (res.Errors.Count > 0)
             {
                 ErrorViewModel errNotifyObj = new ViewModels.ErrorViewModel()
@@ -80,9 +80,8 @@ namespace MyEvernote.WebApp.Controllers
             return View(res.Result);
         }
         public ActionResult EditProfile()
-        {
-            EvernoteUser currentUser = Session["login"] as EvernoteUser; 
-            BusinessLayerResult<EvernoteUser> res = evernoteUserManager.GetUserById(currentUser.Id);
+        { 
+            BusinessLayerResult<EvernoteUser> res = evernoteUserManager.GetUserById(CurrentSession.User.Id);
             if (res.Errors.Count > 0)
             {
                 ErrorViewModel errNotifyObj = new ViewModels.ErrorViewModel()
@@ -128,7 +127,7 @@ namespace MyEvernote.WebApp.Controllers
                 }
 
 
-                Session["login"] = res.Result;
+                CurrentSession.Set<EvernoteUser>("login", res.Result);
 
                 return RedirectToAction("/ShowProfile");
             }
@@ -137,9 +136,8 @@ namespace MyEvernote.WebApp.Controllers
         }
 
         public ActionResult DeleteProfile()
-        {
-            EvernoteUser currentUser = Session["login"] as EvernoteUser; 
-            BusinessLayerResult<EvernoteUser> res = evernoteUserManager.RemoveUserById(currentUser.Id);
+        { 
+            BusinessLayerResult<EvernoteUser> res = evernoteUserManager.RemoveUserById(CurrentSession.User.Id);
             if (res.Errors.Count > 0)
             {
                 ErrorViewModel errorNotifyObj = new ErrorViewModel()
@@ -168,8 +166,8 @@ namespace MyEvernote.WebApp.Controllers
                     res.Errors.ForEach(x => ModelState.AddModelError("", x.Message));
                     return View(model);
                 }
-
-                Session["login"] = res.Result;
+                
+                CurrentSession.Set<EvernoteUser>("login", res.Result);
                 return RedirectToAction("Index");
             }
             return View();
